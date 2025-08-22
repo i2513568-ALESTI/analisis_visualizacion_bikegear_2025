@@ -18,8 +18,8 @@ st.title("📊 Dashboard Comercial - Bike & Gear")
 # url = "https://TU_URL.supabase.co"
 # key = "TU_API_KEY"
 
-url = st.secrets["supabase"]["url"]
-key = st.secrets["supabase"]["key"]
+url = st.secrets["SUPABASE_URL"]
+key = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(url, key)
 
 # --- Cargar datos desde Supabase ---
