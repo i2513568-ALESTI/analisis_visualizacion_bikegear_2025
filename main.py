@@ -25,7 +25,7 @@ supabase: Client = create_client(url, key)
 # --- Cargar datos desde Supabase ---
 @st.cache_data
 def load_data():
-    response = supabase.table("analisis_visualizacion_bikegear_2025").select("*").execute()
+    response = supabase.table("analisis_ventas_bikegear_2025").select("*").execute()
     df = pd.DataFrame(response.data)
     return df
 
