@@ -1,75 +1,38 @@
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-from supabase import create_client, Client
+from pages.productos import productos_page
+from pages.ventas import ventas_page
+from pages.reportes import reportes_page
 
-# --- Configuración de página ---
 st.set_page_config(
-    page_title="Bike & Gear Dashboard",
-    layout="wide"
+    page_title="Bike&Gear Tienda", 
+    page_icon="🚴", 
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-st.title("📊 Dashboard Comercial - Bike & Gear")
+st.sidebar.title("Bike&Gear")
+st.sidebar.markdown("**Gestión Inteligente de tu Tienda**")
 
-# --- Conexión con Supabase ---
-# ⚠️ Debes definir tus credenciales en "Secrets" de Streamlit Cloud
-# En streamlit, pon en .streamlit/secrets.toml:
-# [supabase]
-# url = "https://TU_URL.supabase.co"
-# key = "TU_API_KEY"
+if "menu" not in st.session_state:
+    st.session_state["menu"] = "productos"
 
-url = st.secrets["SUPABASE_URL"]
-key = st.secrets["SUPABASE_KEY"]
-supabase: Client = create_client(url, key)
+opciones_menu = {
+    "Productos": "productos",
+    "Registrar Ventas": "ventas", 
+    "Reportes": "reportes"
+}
 
-# --- Cargar datos desde Supabase ---
-@st.cache_data
-def load_data():
-    response = supabase.table("analisis_ventas_bikegear_2025").select("*").execute()
-    df = pd.DataFrame(response.data)
-    return df
+menu_seleccionado = st.sidebar.selectbox(
+    "Navegación",
+    list(opciones_menu.keys()),
+    index=list(opciones_menu.keys()).index([k for k, v in opciones_menu.items() if v == st.session_state["menu"]][0])
+)
 
-df = load_data()
+st.session_state["menu"] = opciones_menu[menu_seleccionado]
 
-# --- Conversión de fechas ---
-df["Fecha_Venta"] = pd.to_datetime(df["Fecha_Venta"], errors="coerce")
-
-# --- KPIs ---
-st.subheader("🔑 Indicadores Clave de Rendimiento (KPIs)")
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.metric("Ventas Totales (S/.)", f"{df['Ingreso_Total'].sum():,.2f}")
-with col2:
-    st.metric("Ganancia Total (S/.)", f"{df['Ganancia'].sum():,.2f}")
-with col3:
-    st.metric("Número de Ventas", f"{df['ID_Venta'].count():,}")
-
-# --- Evolución temporal ---
-st.subheader("📈 Evolución Temporal de Ingresos")
-df_sorted = df.groupby(df["Fecha_Venta"].dt.to_period("M")).sum(numeric_only=True).reset_index()
-df_sorted["Fecha_Venta"] = df_sorted["Fecha_Venta"].astype(str)
-
-fig, ax = plt.subplots()
-ax.plot(df_sorted["Fecha_Venta"], df_sorted["Ingreso_Total"], marker="o")
-ax.set_xlabel("Mes")
-ax.set_ylabel("Ingresos Totales (S/.)")
-ax.set_title("Tendencia de Ingresos Mensuales")
-plt.xticks(rotation=45)
-st.pyplot(fig)
-
-# --- Top 5 productos más rentables ---
-st.subheader("🏆 Top 5 Productos más Rentables")
-top5 = df.groupby("Nombre_Producto")["Ganancia"].sum().nlargest(5)
-st.bar_chart(top5)
-
-# --- Filtros interactivos ---
-st.subheader("🔍 Filtros Interactivos")
-ciudad = st.selectbox("Selecciona una ciudad:", ["Todas"] + sorted(df["Ciudad_Tienda"].dropna().unique().tolist()))
-
-df_filtrado = df.copy()
-if ciudad != "Todas":
-    df_filtrado = df_filtrado[df_filtrado["Ciudad_Tienda"] == ciudad]
-
-st.write("📌 Mostrando datos para:", ciudad)
-st.dataframe(df_filtrado.head(20))
+if st.session_state["menu"] == "productos":
+    productos_page()
+elif st.session_state["menu"] == "ventas":
+    ventas_page()
+elif st.session_state["menu"] == "reportes":
+    reportes_page()
