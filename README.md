@@ -85,6 +85,7 @@ CREATE TABLE ventas (
     cantidad INTEGER NOT NULL,
     ingreso DECIMAL(10,2) NOT NULL,
     ganancia DECIMAL(10,2) NOT NULL,
+    ubicacion VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 ```

@@ -65,7 +65,7 @@ def productos_page():
                 column_config={
                     "ID": st.column_config.NumberColumn("ID", width="small"),
                     "Nombre del Producto": st.column_config.TextColumn("Nombre del Producto", width="large"),
-                    "Categoría": st.column_config.SelectboxColumn("Categoría", width="medium"),
+                    "Categoría": st.column_config.TextColumn("Categoría", width="medium"),
                     "Precio": st.column_config.TextColumn("Precio", width="medium"),
                     "Costo": st.column_config.TextColumn("Costo", width="medium"),
                     "Stock Disponible": st.column_config.TextColumn("Stock", width="medium")

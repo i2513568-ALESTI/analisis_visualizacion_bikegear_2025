@@ -1,38 +1,32 @@
 import streamlit as st
-from pages.productos import productos_page
-from pages.ventas import ventas_page
-from pages.reportes import reportes_page
+from streamlit_option_menu import option_menu
+from app_pages.productos import productos_page
+from app_pages.ventas import ventas_page
+from app_pages.reportes import reportes_page
 
 st.set_page_config(
-    page_title="Bike&Gear Tienda", 
+    page_title="Bike&Gear Admin", 
     page_icon="🚴", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-st.sidebar.title("Bike&Gear")
-st.sidebar.markdown("**Gestión Inteligente de tu Tienda**")
+# ---- SIDEBAR ----
+with st.sidebar:
+    st.title("🚴 Bike&Gear")
 
-if "menu" not in st.session_state:
-    st.session_state["menu"] = "productos"
+    menu_seleccionado = option_menu(
+        "Navegación",
+        ["Productos", "Registrar Ventas", "Reportes"],
+        icons=["box", "cart-plus", "bar-chart"],  # iconos de Bootstrap
+        menu_icon="list",  
+        default_index=0
+    )
 
-opciones_menu = {
-    "Productos": "productos",
-    "Registrar Ventas": "ventas", 
-    "Reportes": "reportes"
-}
-
-menu_seleccionado = st.sidebar.selectbox(
-    "Navegación",
-    list(opciones_menu.keys()),
-    index=list(opciones_menu.keys()).index([k for k, v in opciones_menu.items() if v == st.session_state["menu"]][0])
-)
-
-st.session_state["menu"] = opciones_menu[menu_seleccionado]
-
-if st.session_state["menu"] == "productos":
+# ---- CONTENIDO ----
+if menu_seleccionado == "Productos":
     productos_page()
-elif st.session_state["menu"] == "ventas":
+elif menu_seleccionado == "Registrar Ventas":
     ventas_page()
-elif st.session_state["menu"] == "reportes":
+elif menu_seleccionado == "Reportes":
     reportes_page()
